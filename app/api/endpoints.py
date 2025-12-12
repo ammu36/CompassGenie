@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from ..domain.agent_state import ChatRequest, ChatResponse
+from ..domain.agent_state import ChatRequest, ChatResponse, MapData
+from ..services.agent_service import invoke_agent_service
 
 router = APIRouter()
 
@@ -9,9 +10,11 @@ async def chat_endpoint(request: ChatRequest):
     Processes a user's geographical query using the LangGraph agent.
     """
     try:
-        result = {}
-        result['response_text'] = "to be added"
-        final_map_data = ""
+        # Call the core logic in the service layer
+        result = invoke_agent_service(request.query, request.location)
+
+        # Convert the raw map_data dictionary into the Pydantic MapData model
+        final_map_data = MapData(**result["map_data"]) if result["map_data"] else None
 
         return ChatResponse(
             response_text=result["response_text"],
