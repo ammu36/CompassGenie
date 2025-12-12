@@ -1,5 +1,5 @@
 import json
-from typing import Literal
+from typing import Literal, Dict
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode
 from langgraph.checkpoint.memory import MemorySaver
@@ -78,7 +78,7 @@ def setup_agent_graph():
 app_graph = setup_agent_graph()
 
 
-def invoke_agent_service(query: str, location: dict[str, float]) -> dict:
+def invoke_agent_service(query: str, location: Dict[str, float]) -> dict:
     """
     The main callable function to run the LangGraph agent.
     Returns the final AI text response and map data.
