@@ -1,0 +1,28 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+}
+
+/* --- Styles for Markdown Content --- */
+.chat-content ul {
+    list-style-type: disc; /* Force bullets to show */
+    padding-left: 1.5rem;  /* Indent lists */
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.chat-content li {
+    margin-bottom: 0.25rem;
+}
+.chat-content h3 {
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #111827;
+}
+.chat-content strong {
+    font-weight: 700;
+    color: #000;
+}
+.chat-content p {
+    margin-bottom: 0.5rem;
+}
