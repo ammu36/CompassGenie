@@ -25,8 +25,10 @@ def _fetch_maps_data(url: str, params: Dict[str, Any]) -> Dict[str, Any]:
         elif data.get("status") == "ZERO_RESULTS":
             return {"results": []}
         else:
+            print(f"Maps Error: {data.get('status')} - {data.get('error_message', '')}")
             return {"error_message": f"Maps Error: {data.get('status')} - {data.get('error_message', '')}"}
     except Exception as e:
+        print(str(e))
         return {"error_message": str(e)}
 
 

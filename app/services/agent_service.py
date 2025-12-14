@@ -94,7 +94,23 @@ def invoke_agent_service(query: str, location: Dict[str, float]) -> dict:
     final_state = app_graph.invoke(initial_state, config=config)
 
     last_message = final_state["messages"][-1]
-    response_text = last_message.content
+    # response_text = last_message.content
+    response_text = ""
+
+    if isinstance(last_message.content, str):
+        # Case 1: Already a clean string (most common success case)
+        response_text = last_message.content
+
+    elif isinstance(last_message.content, list):
+        # Case 2: Content is a list of dictionary blocks (the cause of your error)
+        # We iterate through the list and concatenate any text content found.
+        content_parts = []
+        for part in last_message.content:
+            if isinstance(part, dict) and part.get('type') == 'text':
+                content_parts.append(part.get('text', ''))
+            # Add handling for other potential types if needed, but text is key
+
+        response_text = "\n".join(content_parts)
     map_data = None
 
     # Search for the latest ToolMessage containing map_data
