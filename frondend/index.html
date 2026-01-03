@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompassGenie - AI Map Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="style.css"> </head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-5xl bg-white rounded-xl shadow-2xl flex flex-col lg:flex-row h-[90vh]">
+
+        <div id="map" class="w-full lg:w-3/5 h-1/2 lg:h-full bg-gray-200 rounded-t-xl lg:rounded-l-xl lg:rounded-tr-none relative">
+            <div id="map-loading" class="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-70 text-gray-700 text-lg font-semibold z-10">
+                Loading Map...
+            </div>
+        </div>
+
+        <div class="w-full lg:w-2/5 flex flex-col p-6 space-y-4 h-1/2 lg:h-full">
+            <h1 class="text-3xl font-extrabold text-gray-900 border-b pb-2">CompassGenie</h1>
+
+            <div id="chat-box" class="flex-grow overflow-y-auto space-y-4 pr-2">
+                <div class="bg-blue-50 p-3 rounded-lg shadow-sm">
+                    <p class="font-medium text-blue-800">
+                        Hello! I'm CompassGenie, your AI Map Assistant.
+                    </p>
+                    <p class="text-sm text-blue-600 mt-1">
+                        Try asking: "Find italian restaurants nearby" or "Route to Central Park".
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex flex-col space-y-2">
+                <div id="location-status" class="text-sm text-gray-600">
+                    Location: <span id="lat-lng" class="font-mono text-xs">Waiting for GPS...</span>
+                </div>
+                <div class="flex space-x-2">
+                    <input type="text" id="user-input" placeholder="Type your request..." class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150" onkeydown="if(event.key === 'Enter') document.getElementById('send-btn').click()">
+                    <button id="send-btn" onclick="handleChat()" class="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-150 disabled:bg-gray-400" disabled>
+                        Send
+                    </button>
+                </div>
+                <div id="error-message" class="text-red-500 text-sm hidden"></div>
+                <div id="loading-indicator" class="text-sm text-gray-500 hidden italic">CompassGenie is thinking...</div>
+            </div>
+        </div>
+    </div>
+    <script src="map_assistant.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={KEY}&callback=initMap&libraries=marker,places,routes&v=weekly"></script>
+
+
+</body>
+</html>
