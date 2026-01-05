@@ -1,2 +1,24 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+env/
+cg3.12venv/
 .env
-.idea
+
+# Testing
+.pytest_cache/
+.ruff_cache/
+tests/.pytest_cache/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
