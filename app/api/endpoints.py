@@ -4,6 +4,7 @@ from ..services.agent_service import invoke_agent_service
 
 router = APIRouter()
 
+
 @router.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
     """
