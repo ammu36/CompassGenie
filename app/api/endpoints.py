@@ -45,7 +45,6 @@ async def health_check():
         }
     }
 
-    # Optional: Quick ping to Google Maps (doesn't use credits)
     try:
         res = requests.get("https://maps.googleapis.com/maps/api/staticmap", timeout=2)
         health_status["dependencies"]["google_maps_api"] = "reachable" if res.status_code == 200 else "error"
