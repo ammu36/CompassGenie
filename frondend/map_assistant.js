@@ -22,7 +22,7 @@ function getUserLocation() {
     const sendButton = document.getElementById('send-btn');
     statusElement.textContent = 'Acquiring...';
 
-    const DEFAULT_LOCATION = { lat: 34.0522, lng: -118.2437 }; // LA Default
+    const DEFAULT_LOCATION = { lat: 34.0522, lng: -118.2437 };
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -38,6 +38,13 @@ function getUserLocation() {
             },
             (error) => {
                 console.error("Geolocation failed:", error);
+
+                // Specific handling for timeout
+                if (error.code === error.TIMEOUT) {
+                    showMessage("Location request timed out. Retrying with lower accuracy...", 'warning');
+                    // OPTIONAL: Call getUserLocation again with enableHighAccuracy: false
+                }
+
                 userLocation = DEFAULT_LOCATION;
                 statusElement.textContent = `Fallback: Lat: ${userLocation.lat.toFixed(4)}, Lng: ${userLocation.lng.toFixed(4)}`;
                 showMessage("Could not get location. Using default.", 'error');
@@ -47,7 +54,11 @@ function getUserLocation() {
                     addMarker(userLocation, "Fallback Location", 'purple');
                 }
             },
-            { enableHighAccuracy: true, timeout: 5000 }
+            {
+                enableHighAccuracy: true,
+                timeout: 15000,   // Increased to 15 seconds
+                maximumAge: 30000 // Allow using a location cached in the last 30 seconds
+            }
         );
     } else {
         userLocation = DEFAULT_LOCATION;
@@ -55,10 +66,8 @@ function getUserLocation() {
         sendButton.disabled = false;
     }
 }
-
 // --- 2. GOOGLE MAPS CORE FUNCTIONS ---
 
-// NOTE: This function must be globally accessible for the Google Maps API to call it
 window.initMap = function() {
     const mapContainer = document.getElementById('map');
     document.getElementById('map-loading').style.display = 'none';
@@ -85,7 +94,6 @@ function addMarker(location, title, color = 'red') {
         position: location,
         map: map,
         title: title,
-        // The color logic needs to use the proper marker URL structure
         icon: { url: `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png` }
     });
     markers.push(marker);
@@ -113,7 +121,6 @@ function updateMap(mapData) {
     if (mapData.points && mapData.points.length > 0) {
         hasContent = true;
 
-        // Add current location marker only if route planning didn't add an 'origin_override'
         const hasCustomOrigin = mapData.points.some(p => p.color === 'blue');
 
         if (userLocation && !hasCustomOrigin) {
@@ -122,7 +129,6 @@ function updateMap(mapData) {
         }
 
         mapData.points.forEach(point => {
-            // Use the point's color property if available (for custom origins)
             const markerColor = point.color || 'red';
             const m = addMarker({ lat: point.latitude, lng: point.longitude }, point.name, markerColor);
             bounds.extend(m.getPosition());
@@ -144,7 +150,6 @@ function updateMap(mapData) {
     if (hasContent) {
         map.fitBounds(bounds);
         const listener = google.maps.event.addListener(map, "idle", () => {
-            // Adjust zoom to prevent being too close after fitting bounds
             if (map.getZoom() > 15) map.setZoom(15);
             google.maps.event.removeListener(listener);
         });
@@ -154,7 +159,6 @@ function updateMap(mapData) {
 
 // --- 3. BACKEND COMMUNICATION ---
 
-// NOTE: This function is globally accessible via the onclick="handleChat()" attribute
 window.handleChat = async function() {
     const inputElement = document.getElementById('user-input');
     const query = inputElement.value.trim();

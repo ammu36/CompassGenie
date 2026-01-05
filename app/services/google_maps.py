@@ -58,7 +58,7 @@ def _geocode_address(address: str) -> Dict[str, float] | None:
 
 def decode_polyline(polyline_str: str) -> List[Dict[str, float]]:
     """Decodes a Google Maps encoded polyline string."""
-    # (The original decode_polyline logic remains here)
+    # The original decode_polyline logic remains here
     index, lat, lng = 0, 0, 0
     coordinates = []
     changes = {'latitude': 0, 'longitude': 0}
@@ -109,7 +109,6 @@ def maps_api_search(search_term: str, latitude: float, longitude: float, search_
             "radius": 10000
         }
         api_response = _fetch_maps_data(url, params)
-        # (Rest of nearby search logic, extracting points and response_text)
 
         if "error_message" in api_response:
             return json.dumps({"response_text": api_response['error_message'], "map_data": {}})
