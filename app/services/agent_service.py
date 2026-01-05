@@ -120,14 +120,15 @@ def invoke_agent_service(query: str, location: Dict[str, float]) -> dict:
 
     # Searching for the latest ToolMessage containing map_data
     for msg in reversed(final_state["messages"]):
-        if isinstance(msg, HumanMessage): break
+        if isinstance(msg, HumanMessage):
+            break
         if isinstance(msg, ToolMessage):
             try:
                 data = json.loads(msg.content)
                 if "map_data" in data and (data["map_data"].get("points") or data["map_data"].get("routes")):
                     map_data = data["map_data"]
                     break
-            except:
+            except Exception:
                 continue
 
     return {"response_text": response_text, "map_data": map_data}

@@ -1,4 +1,3 @@
-import pytest
 from app.services.agent_service import app_graph
 from langchain_core.messages import HumanMessage
 

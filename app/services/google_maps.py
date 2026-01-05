@@ -164,7 +164,7 @@ def maps_api_search(search_term: str, latitude: float, longitude: float, search_
             try:
                 advice_prompt = f"Give 1 short traffic tip for driving from {origin_name} to {search_term}."
                 ai_advice = llm.invoke(advice_prompt).content
-            except:
+            except Exception:
                 ai_advice = "* Drive safely!"
 
             results["response_text"] = (
