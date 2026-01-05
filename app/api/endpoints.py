@@ -4,6 +4,7 @@ from ..services.agent_service import invoke_agent_service
 
 router = APIRouter()
 
+
 @router.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
     """
@@ -21,7 +22,7 @@ async def chat_endpoint(request: ChatRequest):
             map_data=final_map_data
         )
     except ValueError as ve:
-        # Catch explicit validation errors (e.g., missing API key)
+        # To catch explicit validation errors (e.g., missing API key)
         raise HTTPException(status_code=503, detail=str(ve))
     except Exception as e:
         print(f"Error in chat endpoint: {e}")

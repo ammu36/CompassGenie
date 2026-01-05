@@ -10,6 +10,7 @@ from langchain_core.tools import tool
 from ..core.config import settings
 from ..domain.agent_state import AgentState
 from .google_maps import maps_api_search
+from .aqi_services import get_aqi
 
 
 llm = ChatGoogleGenerativeAI(
@@ -30,7 +31,7 @@ def google_search_for_weather(query: str, location: str) -> str:
         return f"Search failed: {e}"
 
 
-tools = [google_search_for_weather, maps_api_search]
+tools = [google_search_for_weather, maps_api_search, get_aqi]
 llm_with_tools = llm.bind_tools(tools)
 
 
@@ -48,6 +49,11 @@ def agent_node(state: AgentState):
         "2. **Destination:** Pass the endpoint to the 'search_term' parameter. "
         "3. **General Search:** If no route is requested, use 'search_term' for the place query. "
         "4. **Formatting:** Always format lists as Markdown bullet points."
+        "**AQI INSTRUCTIONS:** "
+        "1. If the user asks about air quality 'here' or 'nearby', call 'get_aqi' using the lat/lng provided above. "
+        "2. If the user mentions a specific city (e.g., 'AQI in Paris'), call 'get_aqi' with the 'location_name' "
+        "parameter. "
+        "Avoid saying mentioning any other apps name"
     ))
 
     response = llm_with_tools.invoke([system_msg] + messages)
@@ -103,17 +109,16 @@ def invoke_agent_service(query: str, location: Dict[str, float]) -> dict:
 
     elif isinstance(last_message.content, list):
         # Case 2: Content is a list of dictionary blocks (the cause of your error)
-        # We iterate through the list and concatenate any text content found.
+        # Iterate through the list and concatenate any text content found.
         content_parts = []
         for part in last_message.content:
             if isinstance(part, dict) and part.get('type') == 'text':
                 content_parts.append(part.get('text', ''))
-            # Add handling for other potential types if needed, but text is key
 
         response_text = "\n".join(content_parts)
     map_data = None
 
-    # Search for the latest ToolMessage containing map_data
+    # Searching for the latest ToolMessage containing map_data
     for msg in reversed(final_state["messages"]):
         if isinstance(msg, HumanMessage): break
         if isinstance(msg, ToolMessage):
