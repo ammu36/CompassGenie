@@ -1,5 +1,5 @@
 // --- CONFIGURATION ---
-const BACKEND_URL = "http://127.0.0.1:8000/chat"; // Backend URL is now central here
+const BACKEND_URL = "http://localhost:8000/chat"
 
 // --- GLOBAL STATE ---
 let map;
