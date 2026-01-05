@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from ..domain.agent_state import ChatRequest, ChatResponse, MapData
 from ..services.agent_service import invoke_agent_service
+import requests
+from ..core.config import settings
 
 router = APIRouter()
 
@@ -27,3 +29,32 @@ async def chat_endpoint(request: ChatRequest):
     except Exception as e:
         print(f"Error in chat endpoint: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.get("/health")
+async def health_check():
+    """
+    Standard health check for orchestration (Docker/K8s).
+    Checks connectivity to external dependencies.
+    """
+    health_status = {
+        "status": "healthy",
+        "dependencies": {
+            "google_maps_api": "unknown",
+            "gemini_api": "ok" if settings.GEMINI_API_KEY else "missing"
+        }
+    }
+
+    # Optional: Quick ping to Google Maps (doesn't use credits)
+    try:
+        res = requests.get("https://maps.googleapis.com/maps/api/staticmap", timeout=2)
+        health_status["dependencies"]["google_maps_api"] = "reachable" if res.status_code == 200 else "error"
+    except Exception:
+        health_status["dependencies"]["google_maps_api"] = "unreachable"
+
+    if health_status["dependencies"]["google_maps_api"] == "unreachable" or not settings.GEMINI_API_KEY:
+        health_status["status"] = "unhealthy"
+        # We return a 503 so Docker knows the service is degraded
+        raise HTTPException(status_code=503, detail=health_status)
+
+    return health_status
