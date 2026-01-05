@@ -1,5 +1,4 @@
 import pytest
-import json
 from unittest.mock import patch
 from app.services.google_maps import _geocode_address, decode_polyline
 
@@ -12,9 +11,9 @@ def test_decode_polyline():
         {"lat": 38.5, "lng": -120.2},
         {"lat": 40.7, "lng": -120.95}
     ]
+
     result = decode_polyline(encoded)
-    assert result[0]["lat"] == pytest.approx(38.5)
-    assert result[1]["lng"] == pytest.approx(-120.95)
+    assert result == pytest.approx(expected)
 
 
 # --- 2. Testing API Logic with Mocks ---
