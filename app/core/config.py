@@ -16,8 +16,9 @@ class Settings(BaseSettings):
     MAPS_MOCK_ENABLED: bool = MAPS_API_KEY == "YOUR_MAPS_API_KEY_HERE"
 
     # LangChain/LLM Model
-    LLM_MODEL: str = "gemini-2.5-flash"
-    LLM_TEMPERATURE: float = 0.0
+    LLM_MODEL: str = "gemini-3-flash-preview"
+    LLM_TEMPERATURE: float = 1.0
+    LLM_THINKING_LEVEL: str = "medium"
 
     # FastAPI Settings
     APP_NAME: str = "CompassGenie Backend API"
