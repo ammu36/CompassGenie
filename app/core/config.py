@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # LangChain/LLM Model
     LLM_MODEL: str = "gemini-3-flash-preview"
     LLM_TEMPERATURE: float = 1.0
-    LLM_THINKING_LEVEL: str = "medium"
+    LLM_THINKING_LEVEL: str = "high"
 
     # FastAPI Settings
     APP_NAME: str = "CompassGenie Backend API"
