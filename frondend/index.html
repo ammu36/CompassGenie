@@ -6,49 +6,96 @@
     <title>CompassGenie - AI Map Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="style.css"> </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Custom scrollbar for a cleaner look */
+        #chat-box::-webkit-scrollbar { width: 6px; }
+        #chat-box::-webkit-scrollbar-thumb { background-color: #e5e7eb; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 flex items-center justify-center p-2 sm:p-4">
 
-    <div class="w-full max-w-5xl bg-white rounded-xl shadow-2xl flex flex-col lg:flex-row h-[90vh]">
+    <div class="w-full max-w-6xl bg-white rounded-2xl shadow-2xl flex flex-col lg:flex-row h-[95vh] lg:h-[90vh] overflow-hidden border border-gray-100">
 
-        <div id="map" class="w-full lg:w-3/5 h-1/2 lg:h-full bg-gray-200 rounded-t-xl lg:rounded-l-xl lg:rounded-tr-none relative">
-            <div id="map-loading" class="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-70 text-gray-700 text-lg font-semibold z-10">
-                Loading Map...
+        <div id="map-container" class="w-full lg:w-3/5 h-2/5 lg:h-full bg-gray-200 relative">
+            <div id="map" class="w-full h-full"></div>
+            <div id="map-loading" class="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-80 text-gray-500 z-10">
+                <div class="flex flex-col items-center">
+                    <svg class="animate-spin h-8 w-8 text-indigo-600 mb-2" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="font-medium">Initializing Map...</span>
+                </div>
             </div>
         </div>
 
-        <div class="w-full lg:w-2/5 flex flex-col p-6 space-y-4 h-1/2 lg:h-full">
-            <h1 class="text-3xl font-extrabold text-gray-900 border-b pb-2">CompassGenie</h1>
+        <div class="w-full lg:w-2/5 flex flex-col p-4 sm:p-6 bg-white h-3/5 lg:h-full">
+            <header class="flex items-center justify-between border-b pb-4 mb-4">
+                <div>
+                    <h1 class="text-2xl font-black text-indigo-700 tracking-tight">CompassGenie</h1>
+                    <div id="location-status" class="flex items-center text-[10px] text-gray-400 mt-1 uppercase tracking-widest font-bold">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                        GPS: <span id="lat-lng" class="ml-1 text-gray-600">Locating...</span>
+                    </div>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 bg-indigo-50 text-indigo-600 rounded">v2.0 Beta</div>
+            </header>
 
-            <div id="chat-box" class="flex-grow overflow-y-auto space-y-4 pr-2">
-                <div class="bg-blue-50 p-3 rounded-lg shadow-sm">
-                    <p class="font-medium text-blue-800">
-                        Hello! I'm CompassGenie, your AI Map Assistant.
-                    </p>
-                    <p class="text-sm text-blue-600 mt-1">
-                        Try asking: "Find italian restaurants nearby" or "Route to Central Park".
+            <div id="chat-box" class="flex-grow overflow-y-auto space-y-4 pr-2 mb-4">
+                <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl shadow-sm">
+                    <p class="font-bold text-indigo-900 text-sm mb-1">Welcome to Gemini 3 Powered Search!</p>
+                    <p class="text-xs text-indigo-700 leading-relaxed">
+                        I can now "see" photos. Upload a picture of a landmark or shop, and I'll find it on the map for you.
                     </p>
                 </div>
             </div>
 
-            <div class="flex flex-col space-y-2">
-                <div id="location-status" class="text-sm text-gray-600">
-                    Location: <span id="lat-lng" class="font-mono text-xs">Waiting for GPS...</span>
+            <div class="flex flex-col space-y-3 pt-2">
+
+                <div id="image-preview-container" class="hidden flex items-center p-2 bg-gray-50 rounded-xl border border-dashed border-gray-300 w-fit relative">
+                    <img id="image-preview" src="" alt="preview" class="h-16 w-16 object-cover rounded-lg shadow-md border-2 border-white">
+                    <button onclick="clearImage()" class="absolute -top-2 -right-2 bg-gray-800 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-600 transition shadow-lg">✕</button>
                 </div>
-                <div class="flex space-x-2">
-                    <input type="text" id="user-input" placeholder="Type your request..." class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150" onkeydown="if(event.key === 'Enter') document.getElementById('send-btn').click()">
-                    <button id="send-btn" onclick="handleChat()" class="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-150 disabled:bg-gray-400" disabled>
+
+                <div class="flex items-center space-x-2 bg-white border border-gray-200 p-1.5 rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent transition-all">
+
+                    <input type="file" id="image-input" accept="image/*" class="hidden" onchange="previewImage(this)">
+
+                    <button onclick="document.getElementById('image-input').click()" class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition" title="Upload Image">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+
+                    <input type="text" id="user-input"
+                           placeholder="Ask about a place or image..."
+                           class="flex-grow bg-transparent outline-none p-2 text-sm text-gray-700 placeholder-gray-400"
+                           onkeydown="if(event.key === 'Enter') handleChat()">
+
+                    <button id="send-btn" onclick="handleChat()"
+                            class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition disabled:bg-gray-300 disabled:shadow-none" disabled>
                         Send
                     </button>
                 </div>
-                <div id="error-message" class="text-red-500 text-sm hidden"></div>
-                <div id="loading-indicator" class="text-sm text-gray-500 hidden italic">CompassGenie is thinking...</div>
+
+                <div id="error-message" class="text-red-500 text-[11px] font-medium hidden px-2"></div>
+                <div id="loading-indicator" class="hidden px-2">
+                    <div class="flex items-center space-x-2">
+                        <div class="flex space-x-1">
+                            <div class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"></div>
+                            <div class="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-.15s]"></div>
+                            <div class="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-bounce [animation-delay:-.3s]"></div>
+                        </div>
+                        <span class="text-xs text-gray-400 italic">Genie is analyzing map & image...</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
     <script src="map_assistant.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={KEY}&callback=initMap&libraries=marker,places,routes&v=weekly"></script>
-
-
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={key}&callback=initMap&libraries=marker,places,routes&v=weekly"></script>
 </body>
 </html>

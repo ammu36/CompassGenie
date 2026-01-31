@@ -85,7 +85,7 @@ def setup_agent_graph():
 app_graph = setup_agent_graph()
 
 
-def invoke_agent_service(query: str, location: Dict[str, float]) -> dict:
+def invoke_agent_service(query: str, location: Dict[str, float], image_b64: str = None) -> dict:
     """
     The main callable function to run the LangGraph agent.
     Returns the final AI text response and map data.
@@ -93,33 +93,42 @@ def invoke_agent_service(query: str, location: Dict[str, float]) -> dict:
     if not settings.GEMINI_API_KEY:
         raise ValueError("Gemini API Key missing")
 
+    # 1. Prepare Multimodal Content
+    # Start with the user's text query
+    content = [{"type": "text", "text": query}]
+
+    # Append the image if provided
+    if image_b64:
+        content.append({
+            "type": "image_url",
+            "image_url": {"url": f"data:image/jpeg;base64,{image_b64}"}
+        })
+
+    # 2. Setup initial state with the multimodal message
     initial_state = {
-        "messages": [HumanMessage(content=query)],
+        "messages": [HumanMessage(content=content)],
         "user_location": location
     }
-    config = {"configurable": {"thread_id": "unique_user_session_id"}}  # Thread ID for checkpointing
+
+    config = {"configurable": {"thread_id": "unique_user_session_id"}}
+
+    # 3. Run the Graph
     final_state = app_graph.invoke(initial_state, config=config)
 
+    # --- POST-PROCESSING ---
     last_message = final_state["messages"][-1]
-    # response_text = last_message.content
     response_text = ""
 
     if isinstance(last_message.content, str):
-        # Case 1: Already a clean string (most common success case)
         response_text = last_message.content
-
     elif isinstance(last_message.content, list):
-        # Case 2: Content is a list of dictionary blocks (the cause of your error)
-        # Iterate through the list and concatenate any text content found.
         content_parts = []
         for part in last_message.content:
             if isinstance(part, dict) and part.get('type') == 'text':
                 content_parts.append(part.get('text', ''))
-
         response_text = "\n".join(content_parts)
-    map_data = None
 
-    # Searching for the latest ToolMessage containing map_data
+    map_data = None
     for msg in reversed(final_state["messages"]):
         if isinstance(msg, HumanMessage):
             break

@@ -13,6 +13,7 @@ class ChatRequest(BaseModel):
     """Input model for the chat endpoint."""
     query: str = Field(..., description="The user's natural language query.")
     location: Dict[str, float] = Field(..., description="The user's current latitude and longitude.")
+    image: str | None = Field(default=None, description="Optional Base64 encoded image string.")
 
 class MapData(BaseModel):
     """Structure for map visualization data."""
