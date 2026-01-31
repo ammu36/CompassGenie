@@ -16,7 +16,8 @@ from .aqi_services import get_aqi
 llm = ChatGoogleGenerativeAI(
     model=settings.LLM_MODEL,
     google_api_key=settings.GEMINI_API_KEY,
-    temperature=settings.LLM_TEMPERATURE
+    temperature=settings.LLM_TEMPERATURE,
+    thinking_level=settings.LLM_THINKING_LEVEL
 )
 
 
