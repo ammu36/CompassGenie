@@ -85,8 +85,12 @@ def decode_polyline(polyline_str: str) -> List[Dict[str, float]]:
     return coordinates
 
 @tool
-def maps_api_search(search_term: str, latitude: float, longitude: float, search_type: str = "nearby",
-                    origin_override: str = None) -> str:
+def maps_api_search(search_term: str,
+                    latitude: float,
+                    longitude: float,
+                    search_type: str = "nearby",
+                    origin_override: str = None,
+                    waypoints: str = None) -> str:
     """
     Searches Google Maps for nearby places or calculates a driving route.
     search_type: 'nearby' (finds places), 'route' (calculates directions).
@@ -148,6 +152,8 @@ def maps_api_search(search_term: str, latitude: float, longitude: float, search_
 
         url = base_url + "directions/json"
         params = {"origin": origin_address, "destination": search_term, "mode": "driving"}
+        if waypoints:
+            params["waypoints"] = waypoints
         api_response = _fetch_maps_data(url, params)
 
         if "error_message" in api_response:
