@@ -115,10 +115,12 @@ function addMarker(location, title, color = 'red') {
 function updateMap(mapData) {
     clearMap();
     if (!mapData) return;
+
     const bounds = new google.maps.LatLngBounds();
     let hasContent = false;
 
-    if (mapData.points) {
+    // 1. Render Markers (Points)
+    if (mapData.points && mapData.points.length > 0) {
         mapData.points.forEach(p => {
             const m = addMarker({ lat: p.latitude, lng: p.longitude }, p.name, p.color);
             bounds.extend(m.getPosition());
@@ -126,7 +128,36 @@ function updateMap(mapData) {
         });
     }
 
-    if (hasContent) map.fitBounds(bounds);
+    // 2. Render Polylines (Routes)
+    if (mapData.routes && mapData.routes.length > 0) {
+        mapData.routes.forEach(route => {
+            if (route.path && route.path.length > 0) {
+                const polyline = new google.maps.Polyline({
+                    path: route.path, // This matches the list of {lat, lng} from your Python decoder
+                    geodesic: true,
+                    strokeColor: "#4F46E5", // Modern Indigo color
+                    strokeOpacity: 0.8,
+                    strokeWeight: 5,
+                    map: map
+                });
+
+                // Add to global state so clearMap() can remove it later
+                routes.push(polyline);
+
+                // Extend bounds so the map zooms to show the whole route
+                route.path.forEach(point => bounds.extend(point));
+                hasContent = true;
+            }
+        });
+    }
+
+    if (hasContent) {
+        map.fitBounds(bounds);
+        const listener = google.maps.event.addListener(map, "idle", function() {
+            if (map.getZoom() > 16) map.setZoom(16);
+            google.maps.event.removeListener(listener);
+        });
+    }
 }
 
 // --- 4. CHAT & BACKEND SYNC ---
