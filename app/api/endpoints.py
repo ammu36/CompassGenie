@@ -13,11 +13,17 @@ async def chat_endpoint(request: ChatRequest):
     Processes a user's geographical query using the LangGraph agent.
     """
     try:
-        # Call the core logic in the service layer
-        result = invoke_agent_service(request.query, request.location)
 
-        # Convert the raw map_data dictionary into the Pydantic MapData model
-        final_map_data = MapData(**result["map_data"]) if result["map_data"] else None
+        result = invoke_agent_service(
+            query=request.query,
+            location=request.location,
+            image_b64=request.image
+        )
+
+        # Safely parse map data
+        final_map_data = None
+        if result.get("map_data"):
+            final_map_data = MapData(**result["map_data"])
 
         return ChatResponse(
             response_text=result["response_text"],
@@ -53,7 +59,7 @@ async def health_check():
 
     if health_status["dependencies"]["google_maps_api"] == "unreachable" or not settings.GEMINI_API_KEY:
         health_status["status"] = "unhealthy"
-        # We return a 503 so Docker knows the service is degraded
+        # Return a 503 so Docker knows the service is degraded
         raise HTTPException(status_code=503, detail=health_status)
 
     return health_status

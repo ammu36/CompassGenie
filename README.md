@@ -4,15 +4,23 @@
 > "Plan my afternoon in South Delhi. I need to find a leather purse under ₹500, avoid high-pollution areas, and finish at a cafe with good Wi-Fi." — **CompassGenie orchestrates the rest.**
 
 ---
+## 📖 Inspiration
+CompassGenie was born out of frustration. During my honeymoon in November, I realized that "smart" travel is currently a fragmented nightmare. I spent more time **app-switching** — toggling between Instagram for inspiration, Google Maps for coordinates, AQI apps for health safety, and YouTube for reviews—than I did enjoying the moment.
+I built CompassGenie to be the **All-in-One Orchestrator** I wish I had — a tool that handles the fragmented research so you can focus on the destination.
 
 ## ✨ Key Capabilities
 
-* **🤖 State-Aware Agent:** Leveraged by **LangGraph** to maintain conversation state, enabling the AI to "reason" and iterate before selecting the appropriate tool.
-* **📍 Precision Geospatial Tools:** Purpose-built integration for Google Maps Text Search, Polyline decoding, and Geocoding for high-accuracy location data.
-* **🍃 Environmental Intelligence:** Real-time retrieval of the Air Quality Index (AQI) via the Google Air Quality API, paired with automated health recommendations.
-* **🗺️ Dynamic Frontend:** A responsive JavaScript/Tailwind UI that dynamically renders markers and route polylines based on AI-extracted `map_data`.
-* **🚦 Traffic-Aware Routing:** Calculates distance and ETA while generating AI-driven traffic tips tailored to specific route conditions.
+-   📸 Vision-to-Venue (Multimodal): Upload any image---a landmark, a street sign, or a storefront. Using Gemini 3's Vision tokens, CompassGenie identifies the location and generates a route instantly.
 
+-   🧠 Agentic State Machine: Powered by LangGraph, the engine doesn't just "search"; it reasons. It maintains state across complex queries, allowing for multi-step iteration.
+
+-   🍱 Intelligent Itinerary Engine: Sequences multiple destinations logically based on geospatial proximity, opening hours, and user time constraints.
+
+-   🥘 Temporal Product Search: Ask for specific items (e.g., "Where can I get a Dosa within a 30-minute radius?"). The AI filters results by calculating real-time traffic ETAs, not just distance.
+
+-   🍃 Environmental Guardian: Real-time integration with the Google Air Quality API. It proactively warns users of unhealthy air levels and suggests "cleaner" alternatives.
+
+-   💰 Budget-Aware Discovery: Find products and venues by synthesizing real-world marketplace data with geospatial proximity.
 ---
 
 ## 📺 Live Demo
@@ -47,23 +55,19 @@ The "brain" of the operation uses a cyclic graph logic:
 
 ## 🛠️ The Tech Stack
 
-| Layer | Technology              | Key Rationale |
-| :--- |:------------------------| :--- |
-| **Language** | Python 3.12             | Utilized for optimized memory management. |
-| **Framework** | FastAPI                 | Asynchronous endpoints for high-speed AI streaming. |
-| **AI Engine** | Google Gemini 2.5 Flash | Chosen for low latency and high reasoning capability. |
-| **Orchestration** | LangGraph & LangChain   | Manages complex agentic "thinking" loops and state. |
-| **Infrastructure** | Docker                  | Containerized for "deploy-anywhere" capability. |
----
+| Layer | Technology            | Key Rationale |
+| :--- |:----------------------| :--- |
+| **Language** | Python 3.12           | Utilized for optimized memory management. |
+| **Framework** | FastAPI               | Asynchronous endpoints for high-speed AI streaming. |
+| **AI Engine** | Google Gemini 3 Flash | Chosen for low latency and high reasoning capability. |
+| **Orchestration** | LangGraph & LangChain | Manages complex agentic "thinking" loops and state. |
+| **Infrastructure** | Docker                | Containerized for "deploy-anywhere" capability. |
+ | **Geospatial** | Google Maps API | Grounding AI logic in verified coordinates and polylines.
 
-## 🌟 Key Capabilities
-
-* **💰 Constraint-Based Commerce:** Integrates budget filtering directly into geospatial searches. Find products within a specific price range in the real world.
-* **📅 Dynamic Itinerary Planning:** Generates full-day schedules based on your current `lat, lng`, current time, and weather constraints.
-* **🍃 Environmental Shield:** Automatically overlays Air Quality Index (AQI) and weather data onto suggested routes.
-* **🗺️ Map-Centric Synthesis:** Converts abstract AI text into visual coordinates, markers, and route polylines.
 
 ---
+
+
 
 ## 🛠️ Installation & Setup
 
